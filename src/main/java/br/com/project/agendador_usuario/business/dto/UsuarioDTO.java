@@ -20,10 +20,8 @@ public class UsuarioDTO {
 
     private String nome;
 
-    @OneToOne(mappedBy = "usuario", cascade = CascadeType.ALL)
     private EnderecoDTO endereco;
 
-    @OneToMany(mappedBy = "usuario", cascade = CascadeType.ALL)
     private List<TelefoneDTO> telefones;
 
 }
