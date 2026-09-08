@@ -2,8 +2,6 @@ package br.com.project.agendador_usuario.infrastructure.security;
 
 import br.com.project.agendador_usuario.infrastructure.entity.Usuario;
 import br.com.project.agendador_usuario.infrastructure.repository.UsuarioRepository;
-import com.javanauta.aprendendospring.infrastructure.entity.Usuario;
-import com.javanauta.aprendendospring.infrastructure.repository.UsuarioRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
