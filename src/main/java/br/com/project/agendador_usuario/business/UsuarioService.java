@@ -1,12 +1,13 @@
 package br.com.project.agendador_usuario.business;
 
 import br.com.project.agendador_usuario.business.converter.UsuarioConverter;
-import br.com.project.agendador_usuario.business.dto.UsuarioDTO;
+import br.com.project.agendador_usuario.business.dto.usuarioDto.CadastroUsuarioDto;
+import br.com.project.agendador_usuario.business.dto.usuarioDto.DetalhesUsuarioDto;
+import br.com.project.agendador_usuario.infrastructure.entity.Telefone;
 import br.com.project.agendador_usuario.infrastructure.entity.Usuario;
 import br.com.project.agendador_usuario.infrastructure.exceptions.ConflictException;
 import br.com.project.agendador_usuario.infrastructure.repository.UsuarioRepository;
 import lombok.RequiredArgsConstructor;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -18,12 +19,11 @@ public class UsuarioService {
     private final UsuarioConverter usuarioConverter;
     private final PasswordEncoder passwordEncoder;
 
-    public UsuarioDTO salvaUsuario(UsuarioDTO usuarioDTO) {
-        System.out.println(usuarioDTO.getEmail());
-        emailExists(usuarioDTO.getEmail());
-        usuarioDTO.setSenha(passwordEncoder.encode(usuarioDTO.getSenha()));
+    public Usuario salvaUsuario(CadastroUsuarioDto usuarioDTO) {
+        emailExists(usuarioDTO.email());
         Usuario usuario = usuarioConverter.toUsuario(usuarioDTO);
-        return usuarioConverter.toUsuarioDTO(usuarioRepository.save(usuario));
+        usuario.setSenha(passwordEncoder.encode(usuarioDTO.senha()));
+        return usuarioRepository.save(usuario);
     }
 
     private void emailExists(String email) {
@@ -33,6 +33,15 @@ public class UsuarioService {
             }
         } catch (ConflictException e) {
             throw new ConflictException("Email já cadastrado ", e.getCause());
+        }
+    }
+
+    public Usuario buscarUsuarioPorEmail(String email) {
+        try {
+            return usuarioRepository.findByEmail(email)
+                    .orElseThrow(() -> new ConflictException("Usuário não encontrado: " + email));
+        } catch (ConflictException e) {
+            throw new ConflictException("Usuário não encontrado: ", e.getCause());
         }
     }
 }
