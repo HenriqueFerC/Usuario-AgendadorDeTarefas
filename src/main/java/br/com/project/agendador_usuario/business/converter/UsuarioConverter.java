@@ -1,8 +1,8 @@
 package br.com.project.agendador_usuario.business.converter;
 
-import br.com.project.agendador_usuario.business.dto.EnderecoDTO;
-import br.com.project.agendador_usuario.business.dto.TelefoneDTO;
-import br.com.project.agendador_usuario.business.dto.UsuarioDTO;
+import br.com.project.agendador_usuario.business.dto.enderecoDto.CadastroEnderecoDto;
+import br.com.project.agendador_usuario.business.dto.telefoneDto.CadastroTelefoneDto;
+import br.com.project.agendador_usuario.business.dto.usuarioDto.CadastroUsuarioDto;
 import br.com.project.agendador_usuario.infrastructure.entity.Endereco;
 import br.com.project.agendador_usuario.infrastructure.entity.Telefone;
 import br.com.project.agendador_usuario.infrastructure.entity.Usuario;
@@ -13,71 +13,44 @@ import java.util.List;
 @Component
 public class UsuarioConverter {
 
-    public Usuario toUsuario(UsuarioDTO usuarioDTO) {
-        return Usuario.builder()
-                .nome(usuarioDTO.getNome())
-                .email(usuarioDTO.getEmail())
-                .senha(usuarioDTO.getSenha())
-                .endereco(toEndereco(usuarioDTO.getEndereco()))
-                .telefones(toListTelefone(usuarioDTO.getTelefones()))
+    public Usuario toUsuario(CadastroUsuarioDto usuarioDTO) {
+        Endereco endereco = toEndereco(usuarioDTO.endereco());
+        List<Telefone> telefones = toListTelefone(usuarioDTO.telefones());
+
+        Usuario usuario = Usuario.builder()
+                .nome(usuarioDTO.nome())
+                .email(usuarioDTO.email())
+                .senha(usuarioDTO.senha())
+                .endereco(endereco)
+                .telefones(telefones)
                 .build();
+
+        endereco.setUsuario(usuario);
+        telefones.forEach(telefone -> telefone.setUsuario(usuario));
+        return usuario;
     }
 
 
-    public Endereco toEndereco(EnderecoDTO enderecoDTO) {
+    public Endereco toEndereco(CadastroEnderecoDto enderecoDTO) {
         return Endereco.builder()
-                .rua(enderecoDTO.getRua())
-                .cidade(enderecoDTO.getCidade())
-                .estado(enderecoDTO.getEstado())
-                .cep(enderecoDTO.getCep())
-                .numero(enderecoDTO.getNumero())
+                .rua(enderecoDTO.rua())
+                .cidade(enderecoDTO.cidade())
+                .estado(enderecoDTO.estado())
+                .cep(enderecoDTO.cep())
+                .numero(enderecoDTO.numero())
                 .build();
     }
 
-    public List<Telefone> toListTelefone(List<TelefoneDTO> telefoneDTOList) {
+    public List<Telefone> toListTelefone(List<CadastroTelefoneDto> telefoneDTOList) {
         return telefoneDTOList.stream()
                 .map(this::toTelefone)
                 .toList();
     }
 
-    public Telefone toTelefone(TelefoneDTO telefoneDTO) {
+    public Telefone toTelefone(CadastroTelefoneDto telefoneDTO) {
         return Telefone.builder()
-                .ddd(telefoneDTO.getDdd())
-                .numero(telefoneDTO.getNumero())
-                .build();
-    }
-
-    public UsuarioDTO toUsuarioDTO(Usuario usuario) {
-        return UsuarioDTO.builder()
-                .nome(usuario.getNome())
-                .email(usuario.getEmail())
-                .senha(usuario.getSenha())
-                .endereco(toEnderecoDTO(usuario.getEndereco()))
-                .telefones(toListTelefoneDTO(usuario.getTelefones()))
-                .build();
-    }
-
-
-    public EnderecoDTO toEnderecoDTO(Endereco endereco) {
-        return EnderecoDTO.builder()
-                .estado(endereco.getEstado())
-                .cidade(endereco.getCidade())
-                .rua(endereco.getRua())
-                .cep(endereco.getCep())
-                .numero(endereco.getNumero())
-                .build();
-    }
-
-    public List<TelefoneDTO> toListTelefoneDTO(List<Telefone> telefoneList) {
-        return telefoneList.stream()
-                .map(this::toTelefoneDTO)
-                .toList();
-    }
-
-    public TelefoneDTO toTelefoneDTO(Telefone telefone) {
-        return TelefoneDTO.builder()
-                .ddd(telefone.getDdd())
-                .numero(telefone.getNumero())
+                .ddd(telefoneDTO.ddd())
+                .numero(telefoneDTO.numero())
                 .build();
     }
 }
