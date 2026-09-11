@@ -7,6 +7,7 @@ import br.com.project.agendador_usuario.infrastructure.entity.Telefone;
 import br.com.project.agendador_usuario.infrastructure.entity.Usuario;
 import br.com.project.agendador_usuario.infrastructure.exceptions.ConflictException;
 import br.com.project.agendador_usuario.infrastructure.repository.UsuarioRepository;
+import br.com.project.agendador_usuario.infrastructure.security.JwtUtil;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -18,6 +19,7 @@ public class UsuarioService {
     private final UsuarioRepository usuarioRepository;
     private final UsuarioConverter usuarioConverter;
     private final PasswordEncoder passwordEncoder;
+    private final JwtUtil jwtUtil;
 
     public Usuario salvaUsuario(CadastroUsuarioDto usuarioDTO) {
         emailExists(usuarioDTO.email());
@@ -43,5 +45,12 @@ public class UsuarioService {
         } catch (ConflictException e) {
             throw new ConflictException("Usuário não encontrado: ", e.getCause());
         }
+    }
+
+    public Usuario atualizarUsuario(String token, CadastroUsuarioDto usuarioDTO) {
+        String email = jwtUtil.extractUsername(token.substring(7));
+        Usuario usuario = buscarUsuarioPorEmail(email);
+        Usuario usuarioAtualizado = usuarioConverter.atualizarUsuario(usuario ,usuarioDTO);
+        return usuarioRepository.save(usuarioAtualizado);
     }
 }

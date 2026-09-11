@@ -6,12 +6,17 @@ import br.com.project.agendador_usuario.business.dto.usuarioDto.CadastroUsuarioD
 import br.com.project.agendador_usuario.infrastructure.entity.Endereco;
 import br.com.project.agendador_usuario.infrastructure.entity.Telefone;
 import br.com.project.agendador_usuario.infrastructure.entity.Usuario;
+import lombok.RequiredArgsConstructor;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
 
 @Component
+@RequiredArgsConstructor
 public class UsuarioConverter {
+
+    private final PasswordEncoder passwordEncoder;
 
     public Usuario toUsuario(CadastroUsuarioDto usuarioDTO) {
         Endereco endereco = toEndereco(usuarioDTO.endereco());
@@ -51,6 +56,17 @@ public class UsuarioConverter {
         return Telefone.builder()
                 .ddd(telefoneDTO.ddd())
                 .numero(telefoneDTO.numero())
+                .build();
+    }
+
+    public Usuario atualizarUsuario(Usuario usuario, CadastroUsuarioDto usuarioDTO) {
+        return Usuario.builder()
+                .id(usuario.getId())
+                .nome(usuarioDTO.nome() != null ? usuarioDTO.nome() : usuario.getNome())
+                .email(usuarioDTO.email() != null ? usuarioDTO.email() : usuario.getEmail())
+                .senha(usuarioDTO.senha() != null ? passwordEncoder.encode(usuarioDTO.senha()) : usuario.getSenha())
+                .endereco(usuario.getEndereco())
+                .telefones(usuario.getTelefones())
                 .build();
     }
 }
